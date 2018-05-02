@@ -1,0 +1,59 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+
+#root {
+  width: 50%;
+  margin: 10px auto;
+  border: solid black 2px;
+  background-color: azure;
+}
+
+.lists {
+  margin: 5px 5px 5px 5px;
+  height: 100%;
+  padding: 0;
+}
+
+.lists h1 {
+  text-align: center;
+}
+
+.form {
+  width: 100%;
+  display: inline-block;
+}
+
+.inputNote {
+  float: left;
+  width: 80%;
+  box-sizing: border-box;
+}
+
+.addButton {
+  float: right;
+  width: 20%;
+}
+
+.deleteButton {
+  float: right;
+}
+
+h2 {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  margin-top: 5px;
+}
+
+ul li {
+  float: left;
+  border: solid black 1px;
+  list-style-type: none;
+  margin-top: 5px;
+  width: 100%;
+  vertical-align: center;
+}
