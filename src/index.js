@@ -30,26 +30,62 @@ const ToDoForm = ({ addToDo, state, changeToDo }) => {
   );
 };
 
-const ToDo = ({ todo, keyId, remove }) => {
-  return (
-    <li className="list-group-item clearfix">
-      {todo}
-      <button
-        type="button"
-        className="btn pull-right"
-        onClick={() => {
-          remove(keyId);
-        }}
-      >
-        Delete note
-      </button>
-    </li>
-  );
+const ToDo = ({ typeElem, todo, keyId, dbClick, remove, props }) => {
+  if (typeElem === "label") {
+    return (
+      <li className="list-group-item clearfix">
+        <label
+          key={keyId}
+          onDoubleClick={() => {
+            dbClick(keyId);
+          }}
+          className={"test2"}
+        >
+          {todo}
+        </label>
+        <button
+          type="button"
+          className="btn pull-right"
+          onClick={() => {
+            remove(keyId);
+          }}
+        >
+          Delete note
+        </button>
+      </li>
+    );
+  } else {
+    return (
+      <li className="list-group-item clearfix">
+        <input type="text" value={todo} />
+        <button
+          type="button"
+          className="btn pull-right"
+          onClick={() => {
+            remove(keyId);
+          }}
+        >
+          Delete note
+        </button>
+      </li>
+    );
+  }
 };
 
-const ToDoList = ({ todos, remove }) => {
+const test = () => {};
+
+const ToDoList = ({ typeElem, todos, dbClick, remove, props }) => {
   const todoNote = todos.map(c => {
-    return <ToDo todo={c.note} keyId={c.id} remove={remove} />;
+    return (
+      <ToDo
+        typeElem={typeElem}
+        todo={c.note}
+        keyId={c.id}
+        dbClick={dbClick}
+        remove={remove}
+        props={props}
+      />
+    );
   });
   return <ul className="list-group">{todoNote}</ul>;
 };
@@ -59,7 +95,8 @@ class App extends React.Component {
     super(props);
     this.state = {
       notes: [],
-      inputNote: ""
+      inputNote: "",
+      inputField: "label"
     };
   }
 
@@ -75,8 +112,11 @@ class App extends React.Component {
         />
         <div className="row">
           <ToDoList
+            typeElem={this.state.inputField}
             todos={this.state.notes}
+            dbClick={this.onDoubleClick.bind(this)}
             remove={this.deleteNote.bind(this)}
+            props={this.props}
           />
         </div>
       </div>
@@ -85,6 +125,18 @@ class App extends React.Component {
 
   handleChange(e) {
     this.setState({ inputNote: e.target.value });
+  }
+
+  onDoubleClick(e) {
+    const index = this.state.notes.findIndex(el => el.id === e);
+    let states = this.state.notes;
+    let state = states[index];
+    state.note = this.state.inputNote;
+    states[index] = state;
+    this.setState({ states });
+    this.setState({
+      inputField: "input"
+    });
   }
 
   addNote() {
@@ -103,4 +155,4 @@ class App extends React.Component {
   }
 }
 
-render(<App name="List" />, document.getElementById("root"));
+render(<App name="List" className="test" />, document.getElementById("root"));
