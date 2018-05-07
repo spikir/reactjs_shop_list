@@ -1,7 +1,9 @@
 import React from "react";
+
 import { render } from "react-dom";
 
 let noteId = 0;
+let locked = false;
 
 const ToDoForm = ({ addToDo, state, changeToDo }) => {
   return (
@@ -14,6 +16,7 @@ const ToDoForm = ({ addToDo, state, changeToDo }) => {
           onChange={changeToDo}
         />
       </div>
+
       <div className="col-md-2 col-sm-2">
         <button
           type="button"
@@ -40,7 +43,7 @@ const ToDo = ({
   editKey,
   remove
 }) => {
-  if (typeView === "label") {
+  if (typeView === "label" || locked === true) {
     return (
       <li className="list-group-item clearfix">
         <label
@@ -48,10 +51,10 @@ const ToDo = ({
           onDoubleClick={() => {
             dbClick(keyId);
           }}
-          className={"test2"}
         >
           {todo}
         </label>
+
         <button
           type="button"
           className="btn pull-right"
@@ -64,15 +67,15 @@ const ToDo = ({
       </li>
     );
   } else {
-    stateEditToDo = todo;
+    locked = true;
     return (
       <li className="list-group-item clearfix">
         <input
           type="text"
           value={stateEditToDo}
           className="form-control"
-          onKeyPress={() => {
-            editKey(keyId);
+          onKeyDown={event => {
+            editKey(keyId, event);
           }}
           onChange={stateChange}
         />
@@ -103,6 +106,7 @@ const ToDoList = ({
       />
     );
   });
+
   return <ul className="list-group">{todoNote}</ul>;
 };
 
@@ -112,13 +116,11 @@ class App extends React.Component {
     this.state = {
       notes: [],
       inputNote: "",
-      inputField: "",
-      locked: "no"
+      inputField: ""
     };
   }
 
   render() {
-    console.log("render" + this.state.inputField);
     return (
       <div className="container-fluid">
         <h1 className="text-center">{this.props.name}</h1>
@@ -128,6 +130,7 @@ class App extends React.Component {
           stateToDo={this.state.inputNote}
           changeToDo={this.handleChange.bind(this)}
         />
+
         <div className="row">
           <ToDoList
             todos={this.state.notes}
@@ -147,31 +150,36 @@ class App extends React.Component {
   }
 
   handleEditChange(e) {
+    locked = false;
     this.setState({ inputField: e.target.value });
   }
 
   onDoubleClick(e) {
-    const index = this.state.notes.findIndex(el => el.id === e);
-    let states = this.state.notes;
-    let state = states[index];
-    state.note = this.state.inputNote;
-    state.typeView = "input";
-    state.locked = "yes";
-    states[index] = state;
-    this.setState({ states });
+    if (locked === false) {
+      const index = this.state.notes.findIndex(el => el.id === e);
+      let states = this.state.notes;
+      let state = states[index];
+      state.typeView = "input";
+      states[index] = state;
+      this.setState({ inputField: state.note });
+      this.setState({ states });
+    }
   }
 
-  handleKeyPress(event) {
-    console.log(event.key);
-    if (event.key === "Enter") {
-      console.log("enter press here! ");
-      console.log(event.target.value);
+  handleKeyPress(keyId, e) {
+    if (e.key === "Enter") {
+      const state = this.state.notes.find(el => el.id === keyId);
+      state.typeView = "label";
+      state.note = this.state.inputField;
+      locked = false;
+      this.setState({ state });
     }
   }
 
   addNote() {
     if (this.state.inputNote !== "") {
       noteId++;
+
       this.setState({
         notes: [
           ...this.state.notes,
