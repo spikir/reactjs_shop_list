@@ -16,7 +16,6 @@ const ToDoForm = ({ addToDo, state, changeToDo }) => {
           onChange={changeToDo}
         />
       </div>
-
       <div className="col-md-2 col-sm-2">
         <button
           type="button"
@@ -46,24 +45,27 @@ const ToDo = ({
   if (typeView === "label" || locked === true) {
     return (
       <li className="list-group-item clearfix">
-        <label
-          key={keyId}
-          onDoubleClick={() => {
-            dbClick(keyId);
-          }}
-        >
-          {todo}
-        </label>
-
-        <button
-          type="button"
-          className="btn pull-right"
-          onClick={() => {
-            remove(keyId);
-          }}
-        >
-          Delete note
-        </button>
+        <div class="checkbox">
+          <label
+            key={keyId}
+            onDoubleClick={() => {
+              dbClick(keyId);
+            }}
+            className="btn"
+          >
+            <input type="checkbox" />
+            {todo}
+          </label>
+          <button
+            type="button"
+            className="btn pull-right"
+            onClick={() => {
+              remove(keyId);
+            }}
+          >
+            Delete note
+          </button>
+        </div>
       </li>
     );
   } else {
@@ -106,7 +108,6 @@ const ToDoList = ({
       />
     );
   });
-
   return <ul className="list-group">{todoNote}</ul>;
 };
 
@@ -124,13 +125,11 @@ class App extends React.Component {
     return (
       <div className="container-fluid">
         <h1 className="text-center">{this.props.name}</h1>
-
         <ToDoForm
           addToDo={this.addNote.bind(this)}
           stateToDo={this.state.inputNote}
           changeToDo={this.handleChange.bind(this)}
         />
-
         <div className="row">
           <ToDoList
             todos={this.state.notes}
@@ -179,7 +178,6 @@ class App extends React.Component {
   addNote() {
     if (this.state.inputNote !== "") {
       noteId++;
-
       this.setState({
         notes: [
           ...this.state.notes,
