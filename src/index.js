@@ -4,6 +4,7 @@ import { render } from "react-dom";
 
 let noteId = 0;
 let locked = false;
+let i = 0;
 
 const ToDoForm = ({ addToDo, state, changeToDo }) => {
   return (
@@ -40,12 +41,23 @@ const ToDo = ({
   stateChange,
   stateEditToDo,
   editKey,
-  remove
+  remove,
+  isChecked,
+  updateCheckbox
 }) => {
   if (typeView === "label" || locked === true) {
     return (
       <li className="list-group-item clearfix">
-        <div class="checkbox">
+        <div className="form-inline">
+          <label className="btn">
+            <input
+              type="checkbox"
+              onChange={() => {
+                updateCheckbox(keyId);
+              }}
+              checked={isChecked}
+            />
+          </label>
           <label
             key={keyId}
             onDoubleClick={() => {
@@ -53,7 +65,6 @@ const ToDo = ({
             }}
             className="btn"
           >
-            <input type="checkbox" />
             {todo}
           </label>
           <button
@@ -72,15 +83,26 @@ const ToDo = ({
     locked = true;
     return (
       <li className="list-group-item clearfix">
-        <input
-          type="text"
-          value={stateEditToDo}
-          className="form-control"
-          onKeyDown={event => {
-            editKey(keyId, event);
-          }}
-          onChange={stateChange}
-        />
+        <div className="form-inline">
+          <label className="btn">
+            <input
+              type="checkbox"
+              onChange={() => {
+                updateCheckbox(keyId);
+              }}
+              checked={isChecked}
+            />
+          </label>
+          <input
+            type="text"
+            value={stateEditToDo}
+            className="form-control"
+            onKeyDown={event => {
+              editKey(keyId, event);
+            }}
+            onChange={stateChange}
+          />
+        </div>
       </li>
     );
   }
@@ -92,7 +114,9 @@ const ToDoList = ({
   stateChange,
   stateEditToDo,
   editKey,
-  remove
+  remove,
+  isChecked,
+  updateCheckbox
 }) => {
   const todoNote = todos.map(c => {
     return (
@@ -105,10 +129,26 @@ const ToDoList = ({
         stateEditToDo={stateEditToDo}
         editKey={editKey}
         remove={remove}
+        isChecked={c.isChecked}
+        updateCheckbox={updateCheckbox}
       />
     );
   });
-  return <ul className="list-group">{todoNote}</ul>;
+  return (
+    <div className="col-md-12 col-sm-12">
+      <ul className="list-group">{todoNote}</ul>
+    </div>
+  );
+};
+
+const ItemsLeft = ({ items }) => {
+  i = items.length;
+  items.map(c => {
+    if (c.isChecked === true) {
+      return i--;
+    }
+  });
+  return <div> {i} items left</div>;
 };
 
 class App extends React.Component {
@@ -117,10 +157,10 @@ class App extends React.Component {
     this.state = {
       notes: [],
       inputNote: "",
-      inputField: ""
+      inputField: "",
+      isChecked: false
     };
   }
-
   render() {
     return (
       <div className="container-fluid">
@@ -138,10 +178,25 @@ class App extends React.Component {
             stateEditToDo={this.state.inputField}
             editKey={this.handleKeyPress.bind(this)}
             remove={this.deleteNote.bind(this)}
+            updateCheckbox={this.updateCheckbox.bind(this)}
           />
+        </div>
+        <div className="row">
+          <ItemsLeft items={this.state.notes} />
         </div>
       </div>
     );
+  }
+
+  updateCheckbox(e) {
+    if (locked === false) {
+      const index = this.state.notes.findIndex(el => el.id === e);
+      let states = this.state.notes;
+      let state = states[index];
+      state.isChecked = !state.isChecked;
+      states[index] = state;
+      this.setState({ states });
+    }
   }
 
   handleChange(e) {
@@ -166,7 +221,7 @@ class App extends React.Component {
   }
 
   handleKeyPress(keyId, e) {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && this.state.inputField !== "") {
       const state = this.state.notes.find(el => el.id === keyId);
       state.typeView = "label";
       state.note = this.state.inputField;
@@ -181,7 +236,12 @@ class App extends React.Component {
       this.setState({
         notes: [
           ...this.state.notes,
-          { id: noteId, note: this.state.inputNote, typeView: "label" }
+          {
+            id: noteId,
+            note: this.state.inputNote,
+            typeView: "label",
+            isChecked: false
+          }
         ]
       });
     }
