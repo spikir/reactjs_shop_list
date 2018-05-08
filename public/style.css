@@ -16,3 +16,7 @@ body {
 .list-group-item {
   word-wrap: break-word;
 }
+
+.form-inline .form-control {
+  width: 100% !important;
+}

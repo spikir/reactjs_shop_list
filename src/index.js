@@ -21,7 +21,6 @@ const ToDoForm = ({ addToDo, state, changeToDo }) => {
         <button
           type="button"
           className="btn btn-default btn-xl btn-block"
-          id="addButton"
           onClick={() => {
             addToDo();
           }}
@@ -48,51 +47,49 @@ const ToDo = ({
   if (typeView === "label" || locked === true) {
     return (
       <li className="list-group-item clearfix">
-        <div className="form-inline">
-          <label className="btn">
-            <input
-              type="checkbox"
-              onChange={() => {
-                updateCheckbox(keyId);
-              }}
-              checked={isChecked}
-            />
-          </label>
-          <label
-            key={keyId}
-            onDoubleClick={() => {
-              dbClick(keyId);
+        <label className="btn col-md-1 col-sm-1">
+          <input
+            type="checkbox"
+            onChange={() => {
+              updateCheckbox(keyId);
             }}
-            className="btn"
-          >
-            {todo}
-          </label>
-          <button
-            type="button"
-            className="btn pull-right"
-            onClick={() => {
-              remove(keyId);
-            }}
-          >
-            Delete note
-          </button>
-        </div>
+            checked={isChecked}
+          />
+        </label>
+        <label
+          key={keyId}
+          onDoubleClick={() => {
+            dbClick(keyId);
+          }}
+          className="btn"
+        >
+          {todo}
+        </label>
+        <button
+          type="button"
+          className="btn pull-right"
+          onClick={() => {
+            remove(keyId);
+          }}
+        >
+          Delete note
+        </button>
       </li>
     );
   } else {
     locked = true;
     return (
-      <li className="list-group-item clearfix">
-        <div className="form-inline">
-          <label className="btn">
-            <input
-              type="checkbox"
-              onChange={() => {
-                updateCheckbox(keyId);
-              }}
-              checked={isChecked}
-            />
-          </label>
+      <li className="list-group-item clearfix form-inline">
+        <label className="col-md-1 col-sm-1 btn">
+          <input
+            type="checkbox"
+            onChange={() => {
+              updateCheckbox(keyId);
+            }}
+            checked={isChecked}
+          />
+        </label>
+        <label className="col-md-11 col-sm-11">
           <input
             type="text"
             value={stateEditToDo}
@@ -102,7 +99,7 @@ const ToDo = ({
             }}
             onChange={stateChange}
           />
-        </div>
+        </label>
       </li>
     );
   }
