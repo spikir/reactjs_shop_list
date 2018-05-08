@@ -5,6 +5,7 @@ import { render } from "react-dom";
 let noteId = 0;
 let locked = false;
 let i = 0;
+let notes = [];
 
 const ToDoForm = ({ addToDo, state, changeToDo }) => {
   return (
@@ -178,8 +179,24 @@ class App extends React.Component {
             updateCheckbox={this.updateCheckbox.bind(this)}
           />
         </div>
-        <div className="row">
+        <div className="input-group">
           <ItemsLeft items={this.state.notes} />
+          <div className="input-group-btn">
+            <button
+              className="btn btn-default btn-xl btn-block"
+              onClick={this.activeItems.bind(this)}
+            >
+              Active Items
+            </button>
+          </div>
+          <div className="input-group-btn">
+            <button
+              className="btn btn-default btn-xl btn-block"
+              onClick={this.allItmes.bind(this)}
+            >
+              All Items
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -230,21 +247,42 @@ class App extends React.Component {
   addNote() {
     if (this.state.inputNote !== "") {
       noteId++;
-      this.setState({
-        notes: [
-          ...this.state.notes,
-          {
-            id: noteId,
-            note: this.state.inputNote,
-            typeView: "label",
-            isChecked: false
-          }
-        ]
-      });
+      this.setState(
+        {
+          notes: [
+            ...this.state.notes,
+            {
+              id: noteId,
+              note: this.state.inputNote,
+              typeView: "label",
+              isChecked: false
+            }
+          ]
+        },
+        function() {
+          this.setItems();
+        }
+      );
     }
   }
 
+  setItems() {
+    notes = this.state.notes;
+  }
+
+  activeItems() {
+    this.setItems();
+    this.setState({
+      notes: this.state.notes.filter(el => el.isChecked === false)
+    });
+  }
+
+  allItmes() {
+    this.setState({ notes });
+  }
+
   deleteNote(e) {
+    notes = notes.filter(el => el.id !== e);
     this.setState({
       notes: this.state.notes.filter(el => el.id !== e)
     });
