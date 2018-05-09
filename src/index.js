@@ -2,12 +2,12 @@ import React from "react";
 
 import { render } from "react-dom";
 
-let noteId = 0;
+let itemId = 0;
 let locked = false;
 let i = 0;
-let notes = [];
+let items = [];
 
-const ToDoForm = ({ addToDo, state, changeToDo }) => {
+const ItemsForm = ({ addItem, state, changeItem }) => {
   return (
     <div className="row">
       <div className="col-md-10 col-sm-10">
@@ -15,7 +15,7 @@ const ToDoForm = ({ addToDo, state, changeToDo }) => {
           className="form-control"
           type="text"
           value={state}
-          onChange={changeToDo}
+          onChange={changeItem}
         />
       </div>
       <div className="col-md-2 col-sm-2">
@@ -23,23 +23,23 @@ const ToDoForm = ({ addToDo, state, changeToDo }) => {
           type="button"
           className="btn btn-default btn-xl btn-block"
           onClick={() => {
-            addToDo();
+            addItem();
           }}
         >
-          Add note
+          Add item
         </button>
       </div>
     </div>
   );
 };
 
-const ToDo = ({
+const Item = ({
   typeView,
-  todo,
+  item,
   keyId,
   dbClick,
   stateChange,
-  stateEditToDo,
+  stateEditItem,
   editKey,
   remove,
   isChecked,
@@ -64,7 +64,7 @@ const ToDo = ({
           }}
           className="btn"
         >
-          {todo}
+          {item}
         </label>
         <button
           type="button"
@@ -73,7 +73,7 @@ const ToDo = ({
             remove(keyId);
           }}
         >
-          Delete note
+          Delete item
         </button>
       </li>
     );
@@ -93,7 +93,7 @@ const ToDo = ({
         <label className="col-md-11 col-sm-11">
           <input
             type="text"
-            value={stateEditToDo}
+            value={stateEditItem}
             className="form-control"
             onKeyDown={event => {
               editKey(keyId, event);
@@ -106,25 +106,25 @@ const ToDo = ({
   }
 };
 
-const ToDoList = ({
-  todos,
+const ItemsList = ({
+  items,
   dbClick,
   stateChange,
-  stateEditToDo,
+  stateEditItem,
   editKey,
   remove,
   isChecked,
   updateCheckbox
 }) => {
-  const todoNote = todos.map(c => {
+  const item = items.map(c => {
     return (
-      <ToDo
+      <Item
         typeView={c.typeView}
-        todo={c.note}
+        item={c.item}
         keyId={c.id}
         dbClick={dbClick}
         stateChange={stateChange}
-        stateEditToDo={stateEditToDo}
+        stateEditItem={stateEditItem}
         editKey={editKey}
         remove={remove}
         isChecked={c.isChecked}
@@ -134,7 +134,7 @@ const ToDoList = ({
   });
   return (
     <div className="col-md-12 col-sm-12">
-      <ul className="list-group">{todoNote}</ul>
+      <ul className="list-group">{item}</ul>
     </div>
   );
 };
@@ -153,8 +153,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      notes: [],
-      inputNote: "",
+      items: [],
+      inputItem: "",
       inputField: "",
       isChecked: false
     };
@@ -163,24 +163,24 @@ class App extends React.Component {
     return (
       <div className="container-fluid">
         <h1 className="text-center">{this.props.name}</h1>
-        <ToDoForm
-          addToDo={this.addNote.bind(this)}
-          stateToDo={this.state.inputNote}
-          changeToDo={this.handleChange.bind(this)}
+        <ItemsForm
+          addItem={this.addItem.bind(this)}
+          stateItem={this.state.inputItem}
+          changeItem={this.handleChange.bind(this)}
         />
         <div className="row">
-          <ToDoList
-            todos={this.state.notes}
+          <ItemsList
+            items={this.state.items}
             dbClick={this.onDoubleClick.bind(this)}
             stateChange={this.handleEditChange.bind(this)}
-            stateEditToDo={this.state.inputField}
+            stateEditItem={this.state.inputField}
             editKey={this.handleKeyPress.bind(this)}
-            remove={this.deleteNote.bind(this)}
+            remove={this.deleteItem.bind(this)}
             updateCheckbox={this.updateCheckbox.bind(this)}
           />
         </div>
         <div className="input-group">
-          <ItemsLeft items={this.state.notes} />
+          <ItemsLeft items={this.state.items} />
           <div className="input-group-btn">
             <button
               className="btn btn-default btn-xl btn-block"
@@ -204,8 +204,8 @@ class App extends React.Component {
 
   updateCheckbox(e) {
     if (locked === false) {
-      const index = this.state.notes.findIndex(el => el.id === e);
-      let states = this.state.notes;
+      const index = this.state.items.findIndex(el => el.id === e);
+      let states = this.state.items;
       let state = states[index];
       state.isChecked = !state.isChecked;
       states[index] = state;
@@ -214,7 +214,7 @@ class App extends React.Component {
   }
 
   handleChange(e) {
-    this.setState({ inputNote: e.target.value });
+    this.setState({ inputItem: e.target.value });
   }
 
   handleEditChange(e) {
@@ -224,37 +224,41 @@ class App extends React.Component {
 
   onDoubleClick(e) {
     if (locked === false) {
-      const index = this.state.notes.findIndex(el => el.id === e);
-      let states = this.state.notes;
+      const index = this.state.items.findIndex(el => el.id === e);
+      let states = this.state.items;
       let state = states[index];
       state.typeView = "input";
       states[index] = state;
-      this.setState({ inputField: state.note });
+      this.setState({ inputField: state.item });
       this.setState({ states });
     }
   }
 
   handleKeyPress(keyId, e) {
     if (e.key === "Enter" && this.state.inputField !== "") {
-      const state = this.state.notes.find(el => el.id === keyId);
+      const state = this.state.items.find(el => el.id === keyId);
       state.typeView = "label";
-      state.note = this.state.inputField;
+      state.item = this.state.inputField;
       locked = false;
       this.setState({ state });
     }
   }
 
-  addNote() {
-    if (this.state.inputNote !== "") {
-      noteId++;
-      this.setState({ notes }, function() {
+  addItem() {
+    if (this.state.inputItem !== "") {
+      itemId++;
+      let filtered = false;
+      if (this.state.items.length !== items.length) {
+        filtered = true;
+      }
+      this.setState({ items }, function() {
         this.setState(
           {
-            notes: [
-              ...this.state.notes,
+            items: [
+              ...this.state.items,
               {
-                id: noteId,
-                note: this.state.inputNote,
+                id: itemId,
+                item: this.state.inputItem,
                 typeView: "label",
                 isChecked: false
               }
@@ -262,6 +266,9 @@ class App extends React.Component {
           },
           function() {
             this.setItems();
+            if (filtered === true) {
+              this.activeItems();
+            }
           }
         );
       });
@@ -269,24 +276,24 @@ class App extends React.Component {
   }
 
   setItems() {
-    notes = this.state.notes;
+    items = this.state.items;
   }
 
   activeItems() {
-    notes = this.state.notes;
+    this.setItems();
     this.setState({
-      notes: this.state.notes.filter(el => el.isChecked === false)
+      items: this.state.items.filter(el => el.isChecked === false)
     });
   }
 
   allItmes() {
-    this.setState({ notes });
+    this.setState({ items });
   }
 
-  deleteNote(e) {
-    notes = notes.filter(el => el.id !== e);
+  deleteItem(e) {
+    items = this.state.items.filter(el => el.id !== e);
     this.setState({
-      notes: this.state.notes.filter(el => el.id !== e)
+      items
     });
   }
 }
