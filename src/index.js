@@ -247,22 +247,24 @@ class App extends React.Component {
   addNote() {
     if (this.state.inputNote !== "") {
       noteId++;
-      this.setState(
-        {
-          notes: [
-            ...this.state.notes,
-            {
-              id: noteId,
-              note: this.state.inputNote,
-              typeView: "label",
-              isChecked: false
-            }
-          ]
-        },
-        function() {
-          this.setItems();
-        }
-      );
+      this.setState({ notes }, function() {
+        this.setState(
+          {
+            notes: [
+              ...this.state.notes,
+              {
+                id: noteId,
+                note: this.state.inputNote,
+                typeView: "label",
+                isChecked: false
+              }
+            ]
+          },
+          function() {
+            this.setItems();
+          }
+        );
+      });
     }
   }
 
@@ -271,7 +273,7 @@ class App extends React.Component {
   }
 
   activeItems() {
-    this.setItems();
+    notes = this.state.notes;
     this.setState({
       notes: this.state.notes.filter(el => el.isChecked === false)
     });
